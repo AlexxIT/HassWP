@@ -9,12 +9,12 @@ Tested on Windows 7 and Windows 10 (both 64-bit).
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.8.5 32bit
-- [Home Assistant](https://www.home-assistant.io/) v0.116.4
-- [HACS](https://hacs.xyz/) v1.6.0
+- [WinPython](https://winpython.github.io/) v3.8.7 32bit
+- [Home Assistant](https://www.home-assistant.io/) v2021.1.1
+- [HACS](https://hacs.xyz/) v1.9.0
 - [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v2.3.2
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v0.7.2
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v2.2.11
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v0.11.0
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.0.1
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.4
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 
