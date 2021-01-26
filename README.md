@@ -32,6 +32,12 @@ Useful files:
 - `web.url` - open default Browser with http://localhost:8123/
 - `config/reset.cmd` - reset Home Assistant but don't touch config files
 
+# Supervisor and Addons
+
+HassWP **don't have and can't have supervisor** and any Hass.io addons. Supervisor can be installed only over Docker. Nativelly Docker works only on Linux core. In any other OS it will use virtualization.
+
+If you really needs Hass.io addons on Windows - use [virtualization](https://www.home-assistant.io/hassio/installation/).
+
 # Move config
 
 You can transfer your configuration to another Hass installation at any time. In another HassWP, venv, docker, hass.io, etc. Windows or Linux, it doesn't matter. Just move the contents of the `config` folder to a new location. Remember about `config/.storage` folder, it is also important. The `config/deps` folder may not be moved, but if you do, it's not a problem.
