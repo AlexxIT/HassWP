@@ -9,14 +9,16 @@ Tested on Windows 7 and Windows 10 (both 64-bit).
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.8.7 32bit
-- [Home Assistant](https://www.home-assistant.io/) v2021.1.1
-- [HACS](https://hacs.xyz/) v1.9.0
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v2.3.2
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v0.11.0
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.0.1
-- [StartTime](https://github.com/AlexxIT/StartTime) v1.1.4
+- [WinPython](https://winpython.github.io/) v3.8.9 32bit
+- [Home Assistant](https://www.home-assistant.io/) v2021.6.5
+- [HACS](https://hacs.xyz/) v1.12.4
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v2.4.6
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v1.2.3
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.3.0
+- [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
+
+**Attention:** Direct works in Windows is not tested by the core developers of Home Assistant. So some components/integrations may not work at all.
 
 # HOWTO
 
@@ -36,7 +38,7 @@ Useful files:
 
 HassWP **don't have and can't have supervisor** and any Hass.io addons. Supervisor can be installed only over Docker. Nativelly Docker works only on Linux core. In any other OS it will use virtualization.
 
-If you really needs Hass.io addons on Windows - use [virtualization](https://www.home-assistant.io/hassio/installation/).
+If you really needs Hass.io addons on Windows - use [virtualization](https://www.home-assistant.io/installation/windows).
 
 # Move config
 
