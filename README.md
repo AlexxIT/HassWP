@@ -49,3 +49,15 @@ Before any movement - stop the old and new Home Assistant!
 # Video Demo
 
 [![Home Assistant Windows Portable (HassWP)](https://img.youtube.com/vi/GFw3J3Jbuas/mqdefault.jpg)](https://www.youtube.com/watch?v=GFw3J3Jbuas)
+
+# Problems
+
+1. If you have this problem:
+
+   ```
+   File "C:\HassWP\python-3.8.7\lib\socket.py", line 49, in <module>
+       import _socket
+   ImportError: DLL load failed while importing _socket
+   ```
+   
+   Install Windows update: **KB2533623**.
