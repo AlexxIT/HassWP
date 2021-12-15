@@ -30,7 +30,6 @@ Useful files:
 
 - `hass.cmd` - run Home Assistant and default Browser
 - `notepad.cmd` - run NotePad with `configuration.yaml`
-- `update.cmd` - try update Home Assistant version (stop Hass before updating)
 - `web.url` - open default Browser with http://localhost:8123/
 - `config/reset.cmd` - reset Home Assistant but don't touch config files
 
