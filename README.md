@@ -5,12 +5,12 @@
 
 Portable version of Home Assistant for Windows.
 
-Tested on Windows 7 and Windows 10 (both 64-bit).
+Minimum requirements: **Windows 8+ 64-bit**. *If you need Windows 7 or 32-bit support - use [old version](https://github.com/AlexxIT/HassWP/releases/tag/v2021.12.10).*
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.8.9 32-bit
-- [Home Assistant](https://www.home-assistant.io/) v2021.12.10
+- [WinPython](https://winpython.github.io/) v3.9.10 64-bit
+- [Home Assistant](https://www.home-assistant.io/) v2022.2.3
 - [HACS](https://hacs.xyz/) v1.22.0
 - [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v2.4.6
 - [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v1.6.5
