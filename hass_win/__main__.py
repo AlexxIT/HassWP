@@ -16,38 +16,54 @@ Version 2:
 import os
 import subprocess
 import sys
+from logging import FileHandler
+from logging.handlers import BaseRotatingHandler
 
-from homeassistant import __main__, requirements, setup
+# noinspection PyPackageRequirements
+from atomicwrites import AtomicWriter
+from homeassistant import __main__, const, requirements, setup
 from homeassistant.helpers import signal
-from homeassistant.util import dt
+from homeassistant.util import package
 
-if "--runner" not in sys.argv:
-    # Run a simple daemon runner process on Windows to handle restarts
-    if sys.argv[0].endswith(".py"):
-        sys.argv.insert(0, "python")
+if __name__ == "__main__":
+    if "--runner" not in sys.argv:
+        # Run a simple daemon runner process on Windows to handle restarts
+        if sys.argv[0].endswith(".py"):
+            sys.argv.insert(0, "python")
 
-    sys.argv.append("--runner")
+        sys.argv.append("--runner")
 
-    while True:
-        try:
-            subprocess.check_call(sys.argv)
-            sys.exit(0)
-        except KeyboardInterrupt:
-            sys.exit(0)
-        except subprocess.CalledProcessError as exc:
-            if exc.returncode != __main__.RESTART_EXIT_CODE:
-                sys.exit(exc.returncode)
+        while True:
+            try:
+                subprocess.check_call(sys.argv)
+                sys.exit(0)
+            except KeyboardInterrupt:
+                sys.exit(0)
+            except subprocess.CalledProcessError as exc:
+                if exc.returncode != __main__.RESTART_EXIT_CODE:
+                    sys.exit(exc.returncode)
 
-elif __main__.REQUIRED_PYTHON_VER >= (3, 9, 0):
-    # runner arg supported only on old Hass versions
-    sys.argv.remove("--runner")
+    elif (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 2):
+        # runner arg supported only on old Hass versions
+        sys.argv.remove("--runner")
+
+
+def wrap_utf8(func):
+    def wrap(*args, **kwargs):
+        if len(args) == 5:
+            return func(args[0], args[1], args[2], args[3] or "utf-8", args[4])
+        kwargs["encoding"] = "utf-8"
+        return func(*args, **kwargs)
+
+    return wrap
 
 
 def wrap_requirements(func):
-    async def wrapper(hass, name, requirements):
-        result = await func(hass, name, requirements)
+    async def wrapper(hass, name, requirements_):
+        result = await func(hass, name, requirements_)
 
         if name == "zha":
+            # noinspection PyPackageRequirements
             from serial.urlhandler import protocol_socket
 
             class Serial(protocol_socket.Serial):
@@ -62,7 +78,7 @@ def wrap_requirements(func):
 
 def wrap_setup(func):
     async def wrapper(hass, domain, config):
-        if domain in ("dhcp", "ffmpeg"):
+        if domain == "dhcp":
             return True
 
         return await func(hass, domain, config)
@@ -70,17 +86,33 @@ def wrap_setup(func):
     return wrapper
 
 
+# fix timezone for Python 3.8
+if not package.is_installed("tzdata"):
+    package.install_package("tzdata")
+
+# remove python version warning
+# noinspection PyFinal
+const.REQUIRED_NEXT_PYTHON_HA_RELEASE = None
+
+# fix Windows encoding
+AtomicWriter.__init__ = wrap_utf8(AtomicWriter.__init__)
+FileHandler.__init__ = wrap_utf8(FileHandler.__init__)
+BaseRotatingHandler.__init__ = wrap_utf8(BaseRotatingHandler.__init__)
+
 # fix Windows depended core bugs
-__main__.validate_os = lambda: None
-dt.get_time_zone = lambda _: dt.DEFAULT_TIME_ZONE
+__main__.validate_os = lambda: None  # Hass v2022.2+
 os.fchmod = lambda *args: None
 signal.async_register_signal_handling = lambda *args: None
 
 # fix socket for ZHA
-requirements.async_process_requirements = \
-    wrap_requirements(requirements.async_process_requirements)
+requirements.async_process_requirements = wrap_requirements(
+    requirements.async_process_requirements
+)
 # fix DHCP and FFmpeg components bugs
 setup.async_setup_component = wrap_setup(setup.async_setup_component)
 
-# run hass
-sys.exit(__main__.main())
+# move dependencies to main python libs folder
+package.is_virtual_env = lambda: True
+
+if __name__ == "__main__":
+    sys.exit(__main__.main())
