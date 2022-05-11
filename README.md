@@ -60,3 +60,16 @@ Before any movement - stop the old and new Home Assistant!
    ```
    
    Install Windows update: **KB2533623**.
+
+# Do it yourself
+
+1. Download and unpack `WinpythonXX-3.XX.XX.0dot.exe`
+2. Run from command line:
+
+```
+scripts\env.bat
+python -m pip install homeassistant==XXXX.XX
+pip install https://github.com/AlexxIT/HassWP/archive/master.zip
+mkdir config
+python -m hass_win -c config -v
+```
