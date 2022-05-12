@@ -5,16 +5,15 @@
 
 Portable version of Home Assistant for Windows.
 
-Minimum requirements: **Windows 8+ 64-bit**. *If you need Windows 7 or 32-bit support - use [old version](https://github.com/AlexxIT/HassWP/releases/tag/v2021.12.10).*
-
 Preinstalled:
 
 - [WinPython](https://winpython.github.io/) v3.9.10 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2022.2.3
-- [HACS](https://hacs.xyz/) v1.22.0
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v2.4.6
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v1.6.5
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.8.0
+- [Home Assistant](https://www.home-assistant.io/) v2022.5.3
+- [HACS](https://hacs.xyz/) v1.24.5
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.0.5
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v2.1.0
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v2.3.0
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.10.0
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 
@@ -22,7 +21,7 @@ Preinstalled:
 
 # HOWTO
 
-1. Download [HassWP.zip](https://github.com/AlexxIT/HassWP/releases/latest)
+1. Download [HassWP_XXXX.XX.X.zip](https://github.com/AlexxIT/HassWP/releases/latest)
 2. Unpack
 3. Run
 
