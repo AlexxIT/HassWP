@@ -6,5 +6,6 @@ setup(
     description="Windows runner for Home Assistant",
     author="AlexxIT",
     install_requires=["homeassistant", "colorlog"],
-    packages=["hass_win"]
+    packages=["hass_win"],
+    package_data={"hass_win": ["*.dll"]},
 )
