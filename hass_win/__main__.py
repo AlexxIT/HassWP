@@ -68,7 +68,7 @@ def wrap_setup(func):
             os.chdir(hass.config.config_dir)
             # and adds it to PATH (useful for ffmpeg)
             os.environ["PATH"] += ";" + hass.config.config_dir
-        elif domain == "dhcp":
+        elif domain in ("dhcp", "radio_browser"):
             return True
         elif domain == "ffmpeg":
             try:
@@ -120,15 +120,6 @@ def wrap_import(func):
 
     return wrapper
 
-
-try:
-    # radios library don't work on windows
-    from homeassistant.components.radio_browser.config_flow import \
-        RadioBrowserConfigFlow
-
-    RadioBrowserConfigFlow.async_create_entry = lambda: None
-except ModuleNotFoundError:
-    pass
 
 # fix timezone for Python 3.8
 if not package.is_installed("tzdata"):
