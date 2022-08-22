@@ -24,6 +24,7 @@ from logging.handlers import BaseRotatingHandler
 
 # noinspection PyPackageRequirements
 from atomicwrites import AtomicWriter
+from colorlog import ColoredFormatter
 from homeassistant import __main__, const, setup
 from homeassistant.helpers import signal
 from homeassistant.loader import Integration
@@ -50,6 +51,14 @@ if __name__ == "__main__":
     elif (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 2):
         # runner arg supported only on old Hass versions
         sys.argv.remove("--runner")
+
+
+def wrap_log(func):
+    def wrap(*args, **kwargs):
+        kwargs.pop("datefmt", None)
+        return func(*args, **kwargs)
+
+    return wrap
 
 
 def wrap_utf8(func):
@@ -131,6 +140,9 @@ ARCH = platform.architecture()[0][:2]  # 32 or 64
 # remove python version warning
 # noinspection PyFinal
 const.REQUIRED_NEXT_PYTHON_HA_RELEASE = None
+
+# adds msec to logger
+ColoredFormatter.__init__ = wrap_log(ColoredFormatter.__init__)
 
 # fix Windows encoding
 AtomicWriter.__init__ = wrap_utf8(AtomicWriter.__init__)
