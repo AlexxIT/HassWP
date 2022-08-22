@@ -14,6 +14,7 @@ Version 2:
 - Home Assistant 2021.12.10 (default_config)
 """
 import logging
+import mimetypes
 import os
 import platform
 import subprocess
@@ -135,6 +136,11 @@ const.REQUIRED_NEXT_PYTHON_HA_RELEASE = None
 AtomicWriter.__init__ = wrap_utf8(AtomicWriter.__init__)
 FileHandler.__init__ = wrap_utf8(FileHandler.__init__)
 BaseRotatingHandler.__init__ = wrap_utf8(BaseRotatingHandler.__init__)
+
+# fix mimetypes for borked Windows machines
+# https://github.com/home-assistant/core/commit/64bcd6097457b0c56528425a6a6ce00a2bce791c
+mimetypes.add_type("text/css", ".css")
+mimetypes.add_type("application/javascript", ".js")
 
 # fix Windows depended core bugs
 __main__.validate_os = lambda: None  # Hass v2022.2+
