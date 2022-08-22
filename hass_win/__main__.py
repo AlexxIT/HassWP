@@ -117,9 +117,11 @@ def pip_pyserial():
 
 def fix_requirements(requirements: list):
     for req in requirements:
-        name = "pip_" + req.split("==")[0].lower()
-        if name in globals():
-            globals().pop(name)()
+        req = req.split("==")[0].lower()
+        if req == "pyturbojpeg":
+            pip_pyturbojpeg()
+        elif req == "pyserial":
+            pip_pyserial()
 
 
 def wrap_import(func):
