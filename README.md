@@ -5,6 +5,8 @@
 
 Portable version of Home Assistant for Windows.
 
+**ATTENTION:** Direct works on Windows is **not maintained by the core developers** of Home Assistant. So some components/integrations may not work at all. No need to ask me or the core authors to fix it. If something you need doesn't work - use [virtualization](https://www.home-assistant.io/installation/windows).
+
 Preinstalled:
 
 - [WinPython](https://winpython.github.io/) v3.9.10 64-bit
@@ -16,8 +18,6 @@ Preinstalled:
 - [YandexStation](https://github.com/AlexxIT/YandexStation) v3.10.0
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
-
-**Attention:** Direct works in Windows is not tested by the core developers of Home Assistant. So some components/integrations may not work at all.
 
 # HOWTO
 
