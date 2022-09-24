@@ -107,33 +107,26 @@ def wrap_setup(func):
     return wrapper
 
 
-# fix PyTurboJPEG for camera and stream
-def pip_pyturbojpeg():
-    from turbojpeg import DEFAULT_LIB_PATHS
-    # downloaded from: https://pypi.org/project/PyTurboJPEG/
-    DEFAULT_LIB_PATHS["Windows"].append(
-        f"{os.path.dirname(__file__)}\\turbojpeg-{ARCH}.dll"
-    )
-
-
-# fix socket for ZHA
-def pip_pyserial():
-    # noinspection PyPackageRequirements
-    from serial.urlhandler import protocol_socket
-
-    class Serial(protocol_socket.Serial):
-        out_waiting = 1
-
-    protocol_socket.Serial = Serial
-
-
 def fix_requirements(requirements: list):
     for req in requirements:
         req = req.split("==")[0].lower()
         if req == "pyturbojpeg":
-            pip_pyturbojpeg()
+            # fix PyTurboJPEG for camera and stream
+            from turbojpeg import DEFAULT_LIB_PATHS
+            # downloaded from: https://pypi.org/project/PyTurboJPEG/
+            DEFAULT_LIB_PATHS["Windows"].append(
+                f"{os.path.dirname(__file__)}\\turbojpeg-{ARCH}.dll"
+            )
+
         elif req == "pyserial":
-            pip_pyserial()
+            # fix socket for ZHA
+            # noinspection PyPackageRequirements
+            from serial.urlhandler import protocol_socket
+
+            class Serial(protocol_socket.Serial):
+                out_waiting = 1
+
+            protocol_socket.Serial = Serial
 
 
 def wrap_import(func):
