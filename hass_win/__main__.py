@@ -21,6 +21,7 @@ import subprocess
 import sys
 from logging import FileHandler
 from logging.handlers import BaseRotatingHandler
+from types import ModuleType
 
 # noinspection PyPackageRequirements
 from atomicwrites import AtomicWriter
@@ -175,6 +176,9 @@ setup.async_setup_component = wrap_setup(setup.async_setup_component)
 
 # move dependencies to main python libs folder
 package.is_virtual_env = lambda: True
+
+# fix bluetooth for Hass v2022.9+
+sys.modules["fcntl"] = ModuleType("")
 
 if __name__ == "__main__":
     sys.exit(__main__.main())
