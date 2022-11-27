@@ -10,10 +10,10 @@ Portable version of Home Assistant for Windows.
 Preinstalled:
 
 - [WinPython](https://winpython.github.io/) v3.9.10 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2022.8.6
-- [HACS](https://hacs.xyz/) v1.26.2
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.1.0
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v2.1.1
+- [Home Assistant](https://www.home-assistant.io/) v2022.11.4
+- [HACS](https://hacs.xyz/) v1.28.3
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.3.1
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v2.1.2
 - [WebRTC](https://github.com/AlexxIT/WebRTC) v2.3.1
 - [YandexStation](https://github.com/AlexxIT/YandexStation) v3.11.0
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
