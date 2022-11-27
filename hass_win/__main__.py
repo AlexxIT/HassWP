@@ -72,18 +72,6 @@ def wrap_utf8(func):
     return wrap
 
 
-def wrap_integration(func):
-    def wrap(self, hass, pkg_path, file_path, manifest):
-        for i, req in enumerate(manifest.get("requirements", [])):
-            if req.startswith("ha-av=="):
-                # only this version has wheels for windows:
-                # https://pypi.org/simple/ha-av/
-                manifest["requirements"][i] = "av==9.2.0"
-        return func(self, hass, pkg_path, file_path, manifest)
-
-    return wrap
-
-
 def wrap_setup(func):
     async def wrapper(hass, domain, config):
         if domain == "homeassistant":
@@ -167,8 +155,6 @@ __main__.validate_os = lambda: None  # Hass v2022.2+
 os.fchmod = lambda *args: None
 signal.async_register_signal_handling = lambda *args: None
 
-# fix before import requirements
-Integration.__init__ = wrap_integration(Integration.__init__)
 # fixes after import requirements
 Integration.get_component = wrap_import(Integration.get_component)
 # fixes on components setup
