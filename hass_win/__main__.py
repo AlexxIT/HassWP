@@ -17,6 +17,7 @@ import logging
 import mimetypes
 import os
 import platform
+import socket
 import subprocess
 import sys
 from logging import FileHandler
@@ -72,7 +73,17 @@ def wrap_utf8(func):
     return wrap
 
 
-def wrap_setup(func):
+def wrap_before_pip(func):
+    def wrap(self, hass, pkg_path, file_path, manifest):
+        if manifest["domain"] == "cast":
+            if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
+                manifest["requirements"] = ["pychromecast==12.1.4"]
+        return func(self, hass, pkg_path, file_path, manifest)
+
+    return wrap
+
+
+def wrap_on_setup(func):
     async def wrapper(hass, domain, config):
         if domain == "homeassistant":
             # set config directory as cwd (useful for camera snapshot)
@@ -118,9 +129,9 @@ def fix_requirements(requirements: list):
             protocol_socket.Serial = Serial
 
 
-def wrap_import(func):
+def wrap_after_pip(func):
     def wrapper(integration: Integration):
-        # in this moment requirements already installed
+        # at this moment requirements already installed
         fix_requirements(integration.requirements)
         return func(integration)
 
@@ -155,16 +166,23 @@ __main__.validate_os = lambda: None  # Hass v2022.2+
 os.fchmod = lambda *args: None
 signal.async_register_signal_handling = lambda *args: None
 
+# fix before import requirements
+Integration.__init__ = wrap_before_pip(Integration.__init__)
 # fixes after import requirements
-Integration.get_component = wrap_import(Integration.get_component)
+Integration.get_component = wrap_after_pip(Integration.get_component)
 # fixes on components setup
-setup.async_setup_component = wrap_setup(setup.async_setup_component)
+setup.async_setup_component = wrap_on_setup(setup.async_setup_component)
 
 # move dependencies to main python libs folder
 package.is_virtual_env = lambda: True
 
 # fix bluetooth for Hass v2022.9+
 sys.modules["fcntl"] = ModuleType("")
+setattr(sys.modules["fcntl"], "ioctl", None)
+
+# fix bluetooth for Hass v2022.12+
+socket.CMSG_LEN = lambda *args: None
+socket.SCM_RIGHTS = 0
 
 if __name__ == "__main__":
     sys.exit(__main__.main())
