@@ -19,7 +19,7 @@ Preinstalled:
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 
-# HOWTO
+## HOWTO
 
 1. Download [HassWP_XXXX.XX.X.zip](https://github.com/AlexxIT/HassWP/releases/latest)
 2. Unpack
@@ -32,29 +32,35 @@ Useful files:
 - `web.url` - open default Browser with http://localhost:8123/
 - `config/reset.cmd` - reset Home Assistant but don't touch config files
 
-# Supervisor and Addons
+## Windows 7 or 32-bit
+
+Latest HassWP versions are build for Windows 8+ 64-bit.
+
+If you want the Windows 7 version or 32-bit support - download [Hass v2021.12.10](https://github.com/AlexxIT/HassWP/releases/tag/v2022.5.3). This is because `Hass 2021.12.10` is the last Hass with `Python 3.8` support. And `Python 3.8` it the last Python with `Windows 7` support.
+
+## Supervisor and Addons
 
 HassWP **don't have and can't have supervisor** and any Hass.io addons. Supervisor can be installed only over Docker. Nativelly Docker works only on Linux core. In any other OS it will use virtualization.
 
 If you really needs Hass.io addons on Windows - use [virtualization](https://www.home-assistant.io/installation/windows).
 
-# Cameras
+## Cameras
 
 Latest HassWP supports [cameras stream](https://www.home-assistant.io/integrations/camera/). For snapshot and recording use relative path from your `config` folder - `media\snapshot.jpeg` or `www\video.mp4`.
 
 [Generic camera](https://www.home-assistant.io/integrations/generic/) and [WebRTC](https://github.com/AlexxIT/WebRTC) integrations do not need ffmpeg in your system. But it you want use [FFmpeg](https://www.home-assistant.io/integrations/ffmpeg/) integration - [download ffmpeg](https://ffmpeg.org/download.html) manually and put `ffmpeg.exe` (80-120 MB) to your config folder.
 
-# Move config
+## Move config
 
 You can transfer your configuration to another Hass installation at any time. In another HassWP, venv, docker, hass.io, etc. Windows or Linux, it doesn't matter. Just move the contents of the `config` folder to a new location. Remember about `config/.storage` folder, it is also important.
 
 Before any movement - stop the old and new Home Assistant!
 
-# Video Demo
+## Video Demo
 
 [![Home Assistant Windows Portable (HassWP)](https://img.youtube.com/vi/GFw3J3Jbuas/mqdefault.jpg)](https://www.youtube.com/watch?v=GFw3J3Jbuas)
 
-# Problems
+## Problems
 
 1. If you have this problem:
 
@@ -66,7 +72,7 @@ Before any movement - stop the old and new Home Assistant!
    
    Install Windows update: **KB2533623**.
 
-# Do it yourself
+## Do it yourself
 
 1. Download and unpack `WinpythonXX-3.XX.XX.0dot.exe`
 2. Run from command line:
