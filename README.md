@@ -1,7 +1,7 @@
 # Home Assistant Windows Portable (HassWP)
 
-[![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
-[![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/41001428278477)
+![](https://img.shields.io/github/stars/AlexxIT/HassWP?style=flat-square&logo=github) 
+![](https://img.shields.io/github/downloads/AlexxIT/HassWP/total?color=blue&style=flat-square&logo=github)  
 
 Portable version of Home Assistant for Windows.
 
@@ -10,11 +10,11 @@ Portable version of Home Assistant for Windows.
 Preinstalled:
 
 - [WinPython](https://winpython.github.io/) v3.9.10 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2022.12.8
-- [HACS](https://hacs.xyz/) v1.29.0
+- [Home Assistant](https://www.home-assistant.io/) v2023.7.1
+- [HACS](https://hacs.xyz/) v1.30.1
 - [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.3.1
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v2.1.2
-- [WebRTC](https://github.com/AlexxIT/WebRTC) v2.3.1
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.1.0
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.0.2
 - [YandexStation](https://github.com/AlexxIT/YandexStation) v3.11.0
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
