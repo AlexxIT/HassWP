@@ -28,7 +28,7 @@ from types import ModuleType
 from atomicwrites import AtomicWriter
 from colorlog import ColoredFormatter
 from homeassistant import __main__, const, setup
-from homeassistant.helpers import signal
+from homeassistant.helpers import frame, signal
 from homeassistant.loader import Integration
 from homeassistant.util import package
 
@@ -161,7 +161,7 @@ BaseRotatingHandler.__init__ = wrap_utf8(BaseRotatingHandler.__init__)
 mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/javascript", ".js")
 
-# fix Windows depended core bugs
+# fix Windows dependes core bugs
 __main__.validate_os = lambda: None  # Hass v2022.2+
 os.fchmod = lambda *args: None
 signal.async_register_signal_handling = lambda *args: None
@@ -183,6 +183,9 @@ setattr(sys.modules["fcntl"], "ioctl", None)
 # fix bluetooth for Hass v2022.12+
 socket.CMSG_LEN = lambda *args: None
 socket.SCM_RIGHTS = 0
+
+# fix Chromecast warning in logs (async_setup_platforms)
+frame.report = lambda *args, **kwargs: None
 
 if __name__ == "__main__":
     sys.exit(__main__.main())
