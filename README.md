@@ -9,13 +9,13 @@ Portable version of Home Assistant for Windows.
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.9.10 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2023.7.1
-- [HACS](https://hacs.xyz/) v1.30.1
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.3.1
+- [WinPython](https://winpython.github.io/) v3.10.9 64-bit
+- [Home Assistant](https://www.home-assistant.io/) v2023.3.6
+- [HACS](https://hacs.xyz/) v1.31.0
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.5.1
 - [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.1.0
-- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.0.2
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.11.0
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.1.0
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.12.1
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 
@@ -59,18 +59,6 @@ Before any movement - stop the old and new Home Assistant!
 ## Video Demo
 
 [![Home Assistant Windows Portable (HassWP)](https://img.youtube.com/vi/GFw3J3Jbuas/mqdefault.jpg)](https://www.youtube.com/watch?v=GFw3J3Jbuas)
-
-## Problems
-
-1. If you have this problem:
-
-   ```
-   File "C:\HassWP\python-3.8.7\lib\socket.py", line 49, in <module>
-       import _socket
-   ImportError: DLL load failed while importing _socket
-   ```
-   
-   Install Windows update: **KB2533623**.
 
 ## Do it yourself
 
