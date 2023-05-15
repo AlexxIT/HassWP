@@ -10,14 +10,16 @@ Portable version of Home Assistant for Windows.
 Preinstalled:
 
 - [WinPython](https://winpython.github.io/) v3.10.9 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2023.3.6
-- [HACS](https://hacs.xyz/) v1.31.0
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.5.1
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.1.0
-- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.1.0
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.12.1
-- [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
+- [Home Assistant](https://www.home-assistant.io/) v2023.5.3
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
+- [HACS](https://hacs.xyz/) v1.32.1
+- [FasterWhisper](https://github.com/AlexxIT/FasterWhisper) v1.0.0
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.5.1
+- [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
+- [StreamAssist](https://github.com/AlexxIT/StreamAssist) v1.0.0
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.1.0
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.2.1
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.12.2
 
 ## HOWTO
 
@@ -55,6 +57,10 @@ Latest HassWP supports [cameras stream](https://www.home-assistant.io/integratio
 You can transfer your configuration to another Hass installation at any time. In another HassWP, venv, docker, hass.io, etc. Windows or Linux, it doesn't matter. Just move the contents of the `config` folder to a new location. Remember about `config/.storage` folder, it is also important.
 
 Before any movement - stop the old and new Home Assistant!
+
+## Voice Assistant
+
+Latest HassWP supports local Speech-to-Text (STT) engine - [Faster Whisper](https://github.com/AlexxIT/FasterWhisper). And [Stream Assist](https://github.com/AlexxIT/StreamAssist) - custom component that allows you to turn almost [any camera](https://www.home-assistant.io/integrations/#camera) and almost [any speaker](https://www.home-assistant.io/integrations/#media-player) into a local [voice assistant](https://www.home-assistant.io/integrations/#voice).
 
 ## Video Demo
 
