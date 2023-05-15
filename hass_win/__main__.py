@@ -1,18 +1,3 @@
-"""
-Run Home Assistant natively in Windows. Tested with:
-
-Version 1:
-
-- Windows 10 x64 (19044.1466)
-- Python 3.9.10 x64
-- Home Assistant 2022.2.0 (default_config)
-
-Version 2:
-
-- Windows 7 x64
-- WinPython v3.8.9 x32
-- Home Assistant 2021.12.10 (default_config)
-"""
 import logging
 import mimetypes
 import os
@@ -20,13 +5,8 @@ import platform
 import socket
 import subprocess
 import sys
-from logging import FileHandler
-from logging.handlers import BaseRotatingHandler
 from types import ModuleType
 
-# noinspection PyPackageRequirements
-from atomicwrites import AtomicWriter
-from colorlog import ColoredFormatter
 from homeassistant import __main__, const, setup
 from homeassistant.helpers import frame, signal
 from homeassistant.loader import Integration
@@ -39,6 +19,9 @@ if __name__ == "__main__":
             sys.argv.insert(0, "python")
 
         sys.argv.append("--runner")
+
+        # https://docs.python.org/3/library/os.html#utf8-mode
+        os.environ["PYTHONUTF8"] = "1"
 
         while True:
             try:
@@ -54,6 +37,8 @@ if __name__ == "__main__":
         # runner arg supported only on old Hass versions
         sys.argv.remove("--runner")
 
+        assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
+
 
 def wrap_log(func):
     def wrap(*args, **kwargs):
@@ -63,21 +48,11 @@ def wrap_log(func):
     return wrap
 
 
-def wrap_utf8(func):
-    def wrap(*args, **kwargs):
-        if len(args) == 5:
-            return func(args[0], args[1], args[2], args[3] or "utf-8", args[4])
-        kwargs["encoding"] = "utf-8"
-        return func(*args, **kwargs)
-
-    return wrap
-
-
 def wrap_before_pip(func):
     def wrap(self, hass, pkg_path, file_path, manifest):
-        if manifest["domain"] == "cast":
-            if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
-                manifest["requirements"] = ["pychromecast==12.1.4"]
+        # if manifest["domain"] == "cast":
+        #     if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
+        #         manifest["requirements"] = ["pychromecast==12.1.4"]
         return func(self, hass, pkg_path, file_path, manifest)
 
     return wrap
@@ -95,9 +70,7 @@ def wrap_on_setup(func):
         elif domain == "ffmpeg":
             try:
                 binary = config.get(domain).get(domain + "_bin", domain)
-                subprocess.Popen(
-                    [binary, "-version"], stdout=subprocess.DEVNULL
-                )
+                subprocess.Popen([binary, "-version"], stdout=subprocess.DEVNULL)
             except Exception:
                 logging.getLogger(__name__).info("FFmpeg DISABLED!")
                 return True
@@ -113,9 +86,10 @@ def fix_requirements(requirements: list):
         if req == "pyturbojpeg":
             # fix PyTurboJPEG for camera and stream
             from turbojpeg import DEFAULT_LIB_PATHS
+
             # downloaded from: https://pypi.org/project/PyTurboJPEG/
             DEFAULT_LIB_PATHS["Windows"].append(
-                f"{os.path.dirname(__file__)}\\turbojpeg-{ARCH}.dll"
+                os.path.dirname(__file__) + f"\\turbojpeg-{ARCH}.dll"
             )
 
         elif req == "pyserial":
@@ -148,14 +122,6 @@ ARCH = platform.architecture()[0][:2]  # 32 or 64
 # noinspection PyFinal
 const.REQUIRED_NEXT_PYTHON_HA_RELEASE = None
 
-# adds msec to logger
-ColoredFormatter.__init__ = wrap_log(ColoredFormatter.__init__)
-
-# fix Windows encoding
-AtomicWriter.__init__ = wrap_utf8(AtomicWriter.__init__)
-FileHandler.__init__ = wrap_utf8(FileHandler.__init__)
-BaseRotatingHandler.__init__ = wrap_utf8(BaseRotatingHandler.__init__)
-
 # fix mimetypes for borked Windows machines
 # https://github.com/home-assistant/core/commit/64bcd6097457b0c56528425a6a6ce00a2bce791c
 mimetypes.add_type("text/css", ".css")
@@ -187,5 +153,17 @@ socket.SCM_RIGHTS = 0
 # fix Chromecast warning in logs (async_setup_platforms)
 frame.report = lambda *args, **kwargs: None
 
+# fix opus library for VOIP integration
+os.environ["PATH"] += ";" + os.path.dirname(__file__)
+
 if __name__ == "__main__":
+    try:
+        # optional color logs
+        from colorlog import ColoredFormatter
+
+        # adds msec to logger
+        ColoredFormatter.__init__ = wrap_log(ColoredFormatter.__init__)
+    except ModuleNotFoundError:
+        pass
+
     sys.exit(__main__.main())

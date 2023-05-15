@@ -1,17 +1,6 @@
 from hass_win import __main__
 
 
-def test_utf8():
-    from logging import FileHandler
-    from logging.handlers import RotatingFileHandler
-    # noinspection PyPackageRequirements
-    from atomicwrites import AtomicWriter
-
-    assert AtomicWriter(__file__, overwrite=False)
-    assert FileHandler(__file__, 'r', None, False).encoding == "utf-8"
-    assert RotatingFileHandler(__file__, 'r').encoding == "utf-8"
-
-
 def test_validate_os():
     from homeassistant import __main__
     assert __main__.validate_python() is None
