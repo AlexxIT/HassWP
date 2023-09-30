@@ -80,6 +80,14 @@ def wrap_on_setup(func):
     return wrapper
 
 
+def wrap_bleak_winrt(func):
+    def wrap(self, address_or_ble_device, **kwargs):
+        kwargs.setdefault("winrt", {})
+        return func(self, address_or_ble_device, **kwargs)
+
+    return wrap
+
+
 def fix_requirements(requirements: list):
     for req in requirements:
         req = req.split("==")[0].lower()
@@ -101,6 +109,17 @@ def fix_requirements(requirements: list):
                 out_waiting = 1
 
             protocol_socket.Serial = Serial
+
+        elif req == "bluetooth-adapters":
+            import bluetooth_adapters
+            from bluetooth_adapters import dbus
+
+            bluetooth_adapters.get_dbus_managed_objects = dbus.get_dbus_managed_objects
+
+        elif req == "bleak":
+            from bleak.backends.winrt.client import BleakClientWinRT
+
+            BleakClientWinRT.__init__ = wrap_bleak_winrt(BleakClientWinRT.__init__)
 
 
 def wrap_after_pip(func):
