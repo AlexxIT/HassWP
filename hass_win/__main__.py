@@ -16,7 +16,7 @@ if __name__ == "__main__":
     if "--runner" not in sys.argv:
         # Run a simple daemon runner process on Windows to handle restarts
         if sys.argv[0].endswith(".py"):
-            sys.argv.insert(0, "python")
+            sys.argv.insert(0, sys.executable)
 
         sys.argv.append("--runner")
 
