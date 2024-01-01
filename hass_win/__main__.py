@@ -50,6 +50,12 @@ def wrap_log(func):
 
 def wrap_before_pip(func):
     def wrap(self, hass, pkg_path, file_path, manifest):
+        if manifest["domain"] == "assist_pipeline":
+            manifest["requirements"] = [
+                i
+                for i in manifest["requirements"]
+                if not i.startswith("webrtc-noise-gain")
+            ]
         # if manifest["domain"] == "cast":
         #     if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
         #         manifest["requirements"] = ["pychromecast==12.1.4"]
