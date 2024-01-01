@@ -9,19 +9,19 @@ Portable version of Home Assistant for Windows.
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.11.5 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2023.9.3
+- [WinPython](https://winpython.github.io/) v3.11.6 64-bit
+- [Home Assistant](https://www.home-assistant.io/) v2023.12.4
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 - [HACS](https://hacs.xyz/) v1.33.0
-- [Ergomotion Smart Beds](https://github.com/AlexxIT/Ergomotion) v1.0.0
+- [Ergomotion Smart Beds](https://github.com/AlexxIT/Ergomotion) v1.0.1
 - [FasterWhisper](https://github.com/AlexxIT/FasterWhisper) v1.0.0
-- [JURA Coffee Machines](https://github.com/AlexxIT/Jura) v1.0.1
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.5.2
+- [JURA Coffee Machines](https://github.com/AlexxIT/Jura) v1.0.2
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.5.3
 - [StartTime](https://github.com/AlexxIT/StartTime) v1.1.6
 - [StreamAssist](https://github.com/AlexxIT/StreamAssist) v1.0.0
-- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.3.0
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.3.2
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.12.4
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.5.0
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v3.3.4
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.12.5
 
 ## HOWTO
 
@@ -35,12 +35,6 @@ Useful files:
 - `notepad.cmd` - run NotePad with `configuration.yaml`
 - `web.url` - open default Browser with http://localhost:8123/
 - `config/reset.cmd` - reset Home Assistant but don't touch config files
-
-## Windows 7 or 32-bit
-
-Latest HassWP versions are build for Windows 8+ 64-bit.
-
-If you want the Windows 7 version or 32-bit support - download [Hass v2021.12.10](https://github.com/AlexxIT/HassWP/releases/tag/v2022.5.3). This is because `Hass 2021.12.10` is the last Hass with `Python 3.8` support. And `Python 3.8` it the last Python with `Windows 7` support.
 
 ## Supervisor and Addons
 
