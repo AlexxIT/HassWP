@@ -137,6 +137,15 @@ def wrap_after_pip(func):
     return wrapper
 
 
+def wrap_chmod(func):
+    def wrapper(path: str, mode, **kwargs):
+        if path.endswith(".state"):
+            return
+        return func(path, mode, **kwargs)
+
+    return wrapper
+
+
 # fix timezone for Python 3.8
 if not package.is_installed("tzdata"):
     package.install_package("tzdata")
@@ -180,6 +189,9 @@ frame.report = lambda *args, **kwargs: None
 
 # fix opus library for VOIP integration
 os.environ["PATH"] += ";" + os.path.dirname(__file__)
+
+# fix homekit bridge
+os.chmod = wrap_chmod(os.chmod)
 
 if __name__ == "__main__":
     try:
