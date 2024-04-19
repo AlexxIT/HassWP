@@ -169,8 +169,8 @@ setup.async_setup_component = wrap_on_setup(setup.async_setup_component)
 package.is_virtual_env = lambda: True
 
 # fix bluetooth for Hass v2022.9+
-sys.modules["fcntl"] = ModuleType("")
-setattr(sys.modules["fcntl"], "ioctl", None)
+mod = sys.modules["fcntl"] = ModuleType("")
+setattr(mod, "ioctl", None)
 
 # fix bluetooth for Hass v2022.12+
 socket.CMSG_LEN = lambda *args: None
