@@ -5,6 +5,7 @@ import platform
 import socket
 import subprocess
 import sys
+import tempfile
 from types import ModuleType
 
 from homeassistant import __main__, const, setup
@@ -138,6 +139,14 @@ def wrap_chmod(func):
     return wrapper
 
 
+def wrap_tempfile(func):
+    def wrapper(*args, **kwargs):
+        kwargs.setdefault("delete", False)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 def fix_webrtc_noise_gain():
     # latest version can't be comile from Windows
     # https://github.com/rhasspy/webrtc-noise-gain/blob/master/python.cpp
@@ -206,6 +215,9 @@ os.environ["PATH"] += ";" + os.path.dirname(__file__)
 
 # fix homekit bridge
 os.chmod = wrap_chmod(os.chmod)
+
+# fix tts convert_audio
+tempfile.NamedTemporaryFile = wrap_tempfile(tempfile.NamedTemporaryFile)
 
 if __name__ == "__main__":
     try:
