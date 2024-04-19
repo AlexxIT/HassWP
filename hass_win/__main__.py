@@ -41,17 +41,17 @@ if __name__ == "__main__":
 
 
 def wrap_before_pip(func):
-    def wrap(self, hass, pkg_path, file_path, manifest):
+    def wrap(self, hass, pkg_path, file_path, manifest, *args):
         if manifest["domain"] == "assist_pipeline":
             manifest["requirements"] = [
-                i
+                "webrtcvad==2.0.10" if i.startswith("webrtc-noise-gain") else i
                 for i in manifest["requirements"]
-                if not i.startswith("webrtc-noise-gain")
             ]
+            fix_webrtc_noise_gain()
         # if manifest["domain"] == "cast":
         #     if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
         #         manifest["requirements"] = ["pychromecast==12.1.4"]
-        return func(self, hass, pkg_path, file_path, manifest)
+        return func(self, hass, pkg_path, file_path, manifest, *args)
 
     return wrap
 
@@ -136,6 +136,28 @@ def wrap_chmod(func):
         return func(path, mode, **kwargs)
 
     return wrapper
+
+
+def fix_webrtc_noise_gain():
+    # latest version can't be comile from Windows
+    # https://github.com/rhasspy/webrtc-noise-gain/blob/master/python.cpp
+    # so we will use previous working version:
+    # https://github.com/home-assistant/core/blob/2023.5.0/homeassistant/components/assist_pipeline/vad.py
+    class AudioProcessor:
+        def __init__(self, *args):
+            import webrtcvad
+
+            self.vad = webrtcvad.Vad(3)
+
+        def Process10ms(self, chunk: bytes):
+            is_speech = self.vad.is_speech(chunk, 16000)
+            cls = type(
+                "ProcessedAudioChunk", (), {"audio": chunk, "is_speech": is_speech}
+            )
+            return cls()
+
+    mod = sys.modules["webrtc_noise_gain"] = ModuleType("")
+    setattr(mod, "AudioProcessor", AudioProcessor)
 
 
 # fix timezone for Python 3.8
