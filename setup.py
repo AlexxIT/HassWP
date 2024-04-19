@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="hass_win",
-    version="2023.12.4",
+    version="2024.4.3",
     description="Windows runner for Home Assistant",
     author="AlexxIT",
     install_requires=[
