@@ -40,14 +40,6 @@ if __name__ == "__main__":
         assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
 
 
-def wrap_log(func):
-    def wrap(*args, **kwargs):
-        kwargs.pop("datefmt", None)
-        return func(*args, **kwargs)
-
-    return wrap
-
-
 def wrap_before_pip(func):
     def wrap(self, hass, pkg_path, file_path, manifest):
         if manifest["domain"] == "assist_pipeline":
@@ -197,9 +189,6 @@ if __name__ == "__main__":
     try:
         # optional color logs
         from colorlog import ColoredFormatter
-
-        # adds msec to logger
-        ColoredFormatter.__init__ = wrap_log(ColoredFormatter.__init__)
     except ModuleNotFoundError:
         pass
 
