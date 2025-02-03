@@ -1,15 +1,13 @@
 import logging
-import mimetypes
 import os
 import platform
-import socket
 import subprocess
 import sys
-import tempfile
-from types import ModuleType
+import warnings
 
-from homeassistant import __main__, const, setup
-from homeassistant.helpers import frame, signal
+from aiohttp import resolver
+from homeassistant import __main__, requirements, setup
+from homeassistant.helpers import signal
 from homeassistant.loader import Integration
 from homeassistant.util import package
 
@@ -34,24 +32,62 @@ if __name__ == "__main__":
                 if exc.returncode != __main__.RESTART_EXIT_CODE:
                     sys.exit(exc.returncode)
 
-    elif (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 2):
-        # runner arg supported only on old Hass versions
-        sys.argv.remove("--runner")
+    # runner arg supported only on old Hass versions
+    sys.argv.remove("--runner")
 
-        assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
+    assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
 
 
-def wrap_before_pip(func):
+def install_requirements(hass, reqs):
+    requirements._install_requirements_if_missing(
+        reqs, requirements.pip_kwargs(hass.config.config_dir)
+    )
+
+
+def wrap_integration_init(func):
     def wrap(self, hass, pkg_path, file_path, manifest, *args):
-        if manifest["domain"] == "assist_pipeline":
-            manifest["requirements"] = [
-                "webrtcvad==2.0.10" if i.startswith("webrtc-noise-gain") else i
-                for i in manifest["requirements"]
-            ]
-            fix_webrtc_noise_gain()
-        # if manifest["domain"] == "cast":
-        #     if (const.MAJOR_VERSION, const.MINOR_VERSION) >= (2022, 12):
-        #         manifest["requirements"] = ["pychromecast==12.1.4"]
+        if manifest["domain"] == "homeassistant":
+            # set config directory as cwd (useful for camera snapshot)
+            os.chdir(hass.config.config_dir)
+            # and adds it to PATH (useful for ffmpeg)
+            os.environ["PATH"] += ";" + hass.config.config_dir
+
+        elif manifest["domain"] == "camera":
+            install_requirements(hass, manifest["requirements"])
+
+            # fix PyTurboJPEG for camera and stream
+            from turbojpeg import DEFAULT_LIB_PATHS
+
+            arch = platform.architecture()[0][:2]  # 32 or 64
+            # downloaded from: https://pypi.org/project/PyTurboJPEG/
+            DEFAULT_LIB_PATHS["Windows"].append(
+                os.path.dirname(__file__) + f"\\turbojpeg-{arch}.dll"
+            )
+
+        elif manifest["domain"] == "bluetooth":
+            install_requirements(hass, manifest["requirements"])
+
+            import bluetooth_adapters
+            from bluetooth_adapters import dbus
+
+            bluetooth_adapters.get_dbus_managed_objects = dbus.get_dbus_managed_objects
+
+            from bleak.backends.winrt.client import BleakClientWinRT
+
+            def wrap_bleak_winrt(func):
+                def wrap(self, address_or_ble_device, **kwargs):
+                    kwargs.setdefault("winrt", {})
+                    return func(self, address_or_ble_device, **kwargs)
+
+                return wrap
+
+            BleakClientWinRT.__init__ = wrap_bleak_winrt(BleakClientWinRT.__init__)
+
+        elif manifest["domain"] == "assist_pipeline":
+            manifest["requirements"] = []
+            sys.modules["pymicro_vad"] = type("", (), {"MicroVad": None})()
+            sys.modules["pyspeex_noise"] = type("", (), {"AudioProcessor": None})()
+
         return func(self, hass, pkg_path, file_path, manifest, *args)
 
     return wrap
@@ -59,12 +95,7 @@ def wrap_before_pip(func):
 
 def wrap_on_setup(func):
     async def wrapper(hass, domain, config):
-        if domain == "homeassistant":
-            # set config directory as cwd (useful for camera snapshot)
-            os.chdir(hass.config.config_dir)
-            # and adds it to PATH (useful for ffmpeg)
-            os.environ["PATH"] += ";" + hass.config.config_dir
-        elif domain in ("dhcp", "radio_browser"):
+        if domain in ("dhcp", "radio_browser"):
             return True
         elif domain == "ffmpeg":
             try:
@@ -79,145 +110,29 @@ def wrap_on_setup(func):
     return wrapper
 
 
-def wrap_bleak_winrt(func):
-    def wrap(self, address_or_ble_device, **kwargs):
-        kwargs.setdefault("winrt", {})
-        return func(self, address_or_ble_device, **kwargs)
-
-    return wrap
-
-
-def fix_requirements(requirements: list):
-    for req in requirements:
-        req = req.split("==")[0].lower()
-        if req == "pyturbojpeg":
-            # fix PyTurboJPEG for camera and stream
-            from turbojpeg import DEFAULT_LIB_PATHS
-
-            # downloaded from: https://pypi.org/project/PyTurboJPEG/
-            DEFAULT_LIB_PATHS["Windows"].append(
-                os.path.dirname(__file__) + f"\\turbojpeg-{ARCH}.dll"
-            )
-
-        elif req == "pyserial":
-            # fix socket for ZHA
-            # noinspection PyPackageRequirements
-            from serial.urlhandler import protocol_socket
-
-            class Serial(protocol_socket.Serial):
-                out_waiting = 1
-
-            protocol_socket.Serial = Serial
-
-        elif req == "bluetooth-adapters":
-            import bluetooth_adapters
-            from bluetooth_adapters import dbus
-
-            bluetooth_adapters.get_dbus_managed_objects = dbus.get_dbus_managed_objects
-
-        elif req == "bleak":
-            from bleak.backends.winrt.client import BleakClientWinRT
-
-            BleakClientWinRT.__init__ = wrap_bleak_winrt(BleakClientWinRT.__init__)
-
-
-def wrap_after_pip(func):
-    def wrapper(integration: Integration):
-        # at this moment requirements already installed
-        fix_requirements(integration.requirements)
-        return func(integration)
-
-    return wrapper
-
-
-def wrap_chmod(func):
-    def wrapper(path: str, mode, **kwargs):
-        if path.endswith(".state"):
-            return
-        return func(path, mode, **kwargs)
-
-    return wrapper
-
-
-def wrap_tempfile(func):
-    def wrapper(*args, **kwargs):
-        kwargs.setdefault("delete", False)
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
-def fix_webrtc_noise_gain():
-    # latest version can't be comile from Windows
-    # https://github.com/rhasspy/webrtc-noise-gain/blob/master/python.cpp
-    # so we will use previous working version:
-    # https://github.com/home-assistant/core/blob/2023.5.0/homeassistant/components/assist_pipeline/vad.py
-    class AudioProcessor:
-        def __init__(self, *args):
-            import webrtcvad
-
-            self.vad = webrtcvad.Vad(3)
-
-        def Process10ms(self, chunk: bytes):
-            is_speech = self.vad.is_speech(chunk, 16000)
-            cls = type(
-                "ProcessedAudioChunk", (), {"audio": chunk, "is_speech": is_speech}
-            )
-            return cls()
-
-    mod = sys.modules["webrtc_noise_gain"] = ModuleType("")
-    setattr(mod, "AudioProcessor", AudioProcessor)
-
-
-# fix timezone for Python 3.8
-if not package.is_installed("tzdata"):
-    package.install_package("tzdata")
-
-ARCH = platform.architecture()[0][:2]  # 32 or 64
-
-# remove python version warning
-# noinspection PyFinal
-const.REQUIRED_NEXT_PYTHON_HA_RELEASE = None
-
-# fix mimetypes for borked Windows machines
-# https://github.com/home-assistant/core/commit/64bcd6097457b0c56528425a6a6ce00a2bce791c
-mimetypes.add_type("text/css", ".css")
-mimetypes.add_type("application/javascript", ".js")
-
-# fix Windows dependes core bugs
+# fix Hass 2022.2: Home Assistant only supports Linux, OSX and Windows using WSL
 __main__.validate_os = lambda: None  # Hass v2022.2+
-os.fchmod = lambda *args: None
-signal.async_register_signal_handling = lambda *args: None
-
-# fix before import requirements
-Integration.__init__ = wrap_before_pip(Integration.__init__)
-# fixes after import requirements
-Integration.get_component = wrap_after_pip(Integration.get_component)
-# fixes on components setup
-setup.async_setup_component = wrap_on_setup(setup.async_setup_component)
 
 # move dependencies to main python libs folder
 package.is_virtual_env = lambda: True
 
-# fix bluetooth for Hass v2022.9+
-mod = sys.modules["fcntl"] = ModuleType("")
-setattr(mod, "ioctl", None)
+# fix: module 'os' has no attribute 'fchmod'. Did you mean: 'chmod'?
+os.fchmod = lambda *args: None
 
-# fix bluetooth for Hass v2022.12+
-socket.CMSG_LEN = lambda *args: None
-socket.SCM_RIGHTS = 0
+# fix: raise NotImplementedError
+signal.async_register_signal_handling = lambda *args: None
 
-# fix Chromecast warning in logs (async_setup_platforms)
-frame.report = lambda *args, **kwargs: None
+# fix Hass 2024.9: aiodns needs a SelectorEventLoop on Windows
+resolver.AsyncResolver = resolver.ThreadedResolver
 
-# fix opus library for VOIP integration
-os.environ["PATH"] += ";" + os.path.dirname(__file__)
+# fix before import requirements
+Integration.__init__ = wrap_integration_init(Integration.__init__)
 
-# fix homekit bridge
-os.chmod = wrap_chmod(os.chmod)
+# fixes on components setup
+setup.async_setup_component = wrap_on_setup(setup.async_setup_component)
 
-# fix tts convert_audio
-tempfile.NamedTemporaryFile = wrap_tempfile(tempfile.NamedTemporaryFile)
+# fix "site-packages\miio\miot_device.py:23: FutureWarning: functools.partial..."
+warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     try:
