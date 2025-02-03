@@ -9,19 +9,19 @@ Portable version of Home Assistant for Windows.
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.12.3 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2024.4.3
+- [WinPython](https://winpython.github.io/) v3.13.1 64-bit
+- [Home Assistant](https://www.home-assistant.io/) v2025.1.4
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
-- [HACS](https://hacs.xyz/) v1.34.0
+- [HACS](https://hacs.xyz/) v2.0.5
 - [Ergomotion Smart Beds](https://github.com/AlexxIT/Ergomotion) v1.0.1
 - [FasterWhisper](https://github.com/AlexxIT/FasterWhisper) v1.0.0
 - [Hass Diagnostics](https://github.com/AlexxIT/HassDiagnostics) v1.0.0
-- [JURA Coffee Machines](https://github.com/AlexxIT/Jura) v1.0.3
-- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.7.1
+- [JURA Coffee Machines](https://github.com/AlexxIT/Jura) v1.1.0
+- [SonoffLAN](https://github.com/AlexxIT/SonoffLAN) v3.8.2
 - [StreamAssist](https://github.com/AlexxIT/StreamAssist) v2.0.0
-- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.5.2
-- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v4.0.3
-- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.15.1
+- [WebRTC](https://github.com/AlexxIT/WebRTC) v3.6.0
+- [XiaomiGateway3](https://github.com/AlexxIT/XiaomiGateway3) v4.0.8
+- [YandexStation](https://github.com/AlexxIT/YandexStation) v3.18.2
 
 ## HOWTO
 
