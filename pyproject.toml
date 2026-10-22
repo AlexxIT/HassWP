@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hass_win"
+version = "2026.10.2"
+description = "Windows runner for Home Assistant"
+readme = "README.md"
+authors = [
+    { name = "AlexxIT" }
+]
+dependencies = [
+    "homeassistant",
+]
+
+[tool.setuptools]
+packages = ["hass_win"]
+
+[tool.setuptools.package-data]
+hass_win = ["*.dll"]
+
+[tool.uv]
+find-links = ["https://alexxit.github.io/python-wheels/"]

@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import sys
@@ -41,15 +42,18 @@ if __name__ == "__main__":
 
     assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
 
+    logging.basicConfig(level=logging.INFO)
+
     install_requirements(["colorlog"])
 
+    # noinspection unsupported-operator
     if (MAJOR_VERSION, MINOR_VERSION) >= (2026, 3):
         from hass_2026_3 import main
     elif (MAJOR_VERSION, MINOR_VERSION) >= (2025, 2):
         from hass_2025_2 import main
     elif (MAJOR_VERSION, MINOR_VERSION) >= (2024, 4):
         from hass_2024_4 import main
-    elif (MAJOR_VERSION, MINOR_VERSION) >= (2023, 2):
+    else:
         from hass_2023_2 import main
 
     main()

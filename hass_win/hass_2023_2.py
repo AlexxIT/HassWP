@@ -3,20 +3,39 @@
 - [x] Python 3.11.9  / Home Assistant 2023.8.4
 """
 
+import json
 import os
-import platform
 import socket
+import sys
 
-from homeassistant import __main__, setup
+from homeassistant import __main__, requirements, setup
 from homeassistant.helpers import signal
 from homeassistant.loader import Integration
 from homeassistant.util import package
 
-from hass_win.hass import (
-    install_component_requirements,
-    install_requirements,
-    sys_module,
-)
+
+def sys_module(name: str, **kwargs):
+    if name not in sys.modules:
+        sys.modules[name] = type(name, (), kwargs)()
+
+
+def install_requirements(reqs: list[str]):
+    # noinspection PyProtectedMember
+    requirements._install_requirements_if_missing(reqs, requirements.pip_kwargs(None))
+
+
+def install_component_requirements(name: str):
+    # noinspection bad-argument-type
+    basedir = os.path.dirname(__main__.__file__)
+    filename = f"{basedir}/components/{name}/manifest.json"
+    with open(filename) as f:
+        manifest = json.load(f)
+    install_requirements(manifest["requirements"])
+
+
+def fix_validate_os():
+    """Fix HA 2022.2: Home Assistant only supports Linux, OSX and Windows using WSL."""
+    __main__.validate_os = lambda: None
 
 
 def fix_add_signal_handler():
@@ -24,9 +43,15 @@ def fix_add_signal_handler():
     signal.async_register_signal_handling = lambda *args: None
 
 
-def fix_validate_os():
-    """Fix HA 2022.2: Home Assistant only supports Linux, OSX and Windows using WSL."""
-    __main__.validate_os = lambda: None
+def fix_fcntl():
+    # ModuleNotFoundError: No module named 'fcntl'
+    sys_module(
+        "fcntl",  # HA 2022.9 bluetooth
+        ioctl=None,  # HA 2023.3
+        flock=lambda *args: None,  # HA 2025.10?
+        LOCK_EX=0,  # HA 2025.10?
+        LOCK_NB=0,  # HA 2025.10?
+    )
 
 
 def fix_config_dir():
@@ -38,7 +63,7 @@ def fix_config_dir():
             os.chdir(hass.config.config_dir)
             # and adds it to PATH (useful for ffmpeg)
             os.environ["PATH"] += ";" + hass.config.config_dir
-        return func(self, hass, pkg_path, file_path, manifest, *args)
+        func(self, hass, pkg_path, file_path, manifest, *args)
 
     Integration.__init__ = wrapper
 
@@ -51,14 +76,22 @@ def fix_is_virtual_env():
 # noinspection PyUnresolvedReferences,PyPackageRequirements
 def fix_turbojpeg():
     """Fix PyTurboJPEG for camera and stream."""
+
+    # sysconfig.get_platform() better than platform.machine()
+    if "AMD64" in sys.version:
+        platform = "amd64"
+    elif "ARM64" in sys.version:
+        platform = "arm64"
+    else:
+        return
+
     install_component_requirements("camera")
 
     from turbojpeg import DEFAULT_LIB_PATHS
 
-    arch = platform.architecture()[0][:2]  # 32 or 64
-    # downloaded from: https://pypi.org/project/PyTurboJPEG/
+    # Downloaded from https://github.com/libjpeg-turbo/libjpeg-turbo/releases/tag/3.2.0
     DEFAULT_LIB_PATHS["Windows"].append(
-        os.path.dirname(__file__) + f"\\turbojpeg-{arch}.dll"
+        f"{os.path.dirname(__file__)}\\turbojpeg-{platform}.dll"
     )
 
 
@@ -73,6 +106,12 @@ def fix_setup_components():
         return await func(hass, domain, config)
 
     setup.async_setup_component = wrapper
+
+
+def fix_tzdata():
+    """Fix HA 2023.2: onboarding."""
+    # ValueError: Received invalid time zone
+    install_requirements(["tzdata"])
 
 
 # noinspection PyUnresolvedReferences,PyPackageRequirements
@@ -98,7 +137,7 @@ def fix_bluetooth():
 def fix_cast():
     func = Integration.__init__
 
-    def wrapper(self, hass, pkg_path, file_path, manifest, *args):
+    def wrapper(self, hass, pkg_path, file_path, manifest):
         if manifest["domain"] == "cast":
             ver = manifest["requirements"][0]
             # fix bugs in libs
@@ -106,7 +145,7 @@ def fix_cast():
                 # HA 2022.11 / pychromecast==12.1.4 - OK
                 # HA 2023.4  / pychromecast==13.0.7 - OK
                 manifest["requirements"] = ["pychromecast==12.1.4"]
-        return func(self, hass, pkg_path, file_path, manifest, *args)
+        func(self, hass, pkg_path, file_path, manifest)
 
     Integration.__init__ = wrapper
 
@@ -116,16 +155,6 @@ def fix_cloud():
     # Fix component cloud -> hass-nabucasa==0.61.0 -> acme==1.31.0 -> josepy>=1.13.0
     # AttributeError: module 'josepy' has no attribute 'ComparableX509'
     install_requirements(["josepy==1.13.0"])
-
-
-def fix_fcntl():
-    sys_module(
-        "fcntl",  # HA 2022.9 bluetooth
-        ioctl=None,  # HA 2023.3
-        flock=lambda *args: None,  # HA 2025.10?
-        LOCK_EX=0,  # HA 2025.10?
-        LOCK_NB=0,  # HA 2025.10?
-    )
 
 
 def fix_os_fchmod():
@@ -145,8 +174,9 @@ def fix_socket():
 
 def main():
     # start-up locks
-    fix_add_signal_handler()
     fix_validate_os()
+    fix_add_signal_handler()
+    fix_fcntl()
 
     # user-friendliness
     fix_config_dir()
@@ -157,9 +187,9 @@ def main():
     fix_setup_components()
 
     # other errors
+    fix_tzdata()
+    fix_socket()  # before bluetooth!
     fix_bluetooth()
     fix_cast()
     fix_cloud()
-    fix_fcntl()
     fix_os_fchmod()
-    fix_socket()
