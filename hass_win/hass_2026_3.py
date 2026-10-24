@@ -5,18 +5,21 @@
     - [x] Onbiarding
 - [x] Python 3.14.8 arm64 / Home Assistant 2026.3.4
     - [x] Onbiarding
-- [x] Python 3.14.8 arm64 / Home Assistant 2026.10.2
+- [x] Python 3.14.8 arm64 / Home Assistant 2026.10.3
     - [x] Onbiarding
-    - [ ] Apple TV
-    - [ ] Bluetooth
-    - [ ] Cast
-    - [ ] Generic Camera
-    - [ ] MusicCast
-    - [ ] Xiaomi BLE
-    - [ ] Xiaomi Home
-    - [ ] Yeelight
-    - [ ] ZHA over TCP
+    - [x] Apple TV (install only)
+    - [x] Bluetooth
+    - [x] Google Cast
+    - [x] Generic Camera
+    - [x] Yamaha MusicCast
+    - [x] Xiaomi BLE
+    - [x] Xiaomi Home (install only)
+    - [x] Yeelight
+    - [x] ZHA over TCP (install only)
 """
+
+import logging
+import sys
 
 from homeassistant.helpers import issue_registry
 
@@ -29,6 +32,7 @@ from hass_2023_2 import (
     fix_setup_components,
     fix_turbojpeg,
     fix_validate_os,
+    install_requirements,
     sys_module,
 )
 from hass_2024_4 import fix_assist_pipeline
@@ -57,6 +61,29 @@ def fix_issue_registry():
     issue_registry.async_create_issue = wrapper
 
 
+def check_win32():
+    """Fix first start for serialx."""
+    install_requirements(["pywin32"])
+    try:
+        import win32con
+    except ModuleNotFoundError:
+        logging.warning("pywin32 install require hass restart")
+        sys.exit(100)  # call hass restart
+
+
+def check_cffi_version():
+    """Fix HA 2026.07.2: Fix first update of cffi library to 2.0.0."""
+    install_requirements(["cffi"])  # version will be selected from constraints file
+
+    import _cffi_backend
+    import cffi
+
+    # This may fail if cffi will be updated during run
+    if _cffi_backend.__version__ != cffi.__version__:
+        logging.warning("cffi version mismatch require hass restart")
+        sys.exit(100)  # call hass restart
+
+
 def main():
     # start-up locks
     fix_validate_os()
@@ -81,3 +108,6 @@ def main():
     fix_dependencies()
     fix_uv_find_links()
     fix_issue_registry()
+
+    check_cffi_version()
+    check_win32()
