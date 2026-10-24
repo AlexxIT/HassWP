@@ -3,9 +3,6 @@ import os
 import subprocess
 import sys
 
-from homeassistant import __main__ as hass, requirements
-from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
-
 
 def run_forever():
     """Run a simple daemon runner process on Windows to handle restarts."""
@@ -14,37 +11,18 @@ def run_forever():
 
     sys.argv.append("--runner")
 
-    # https://docs.python.org/3/library/os.html#utf8-mode
-    os.environ["PYTHONUTF8"] = "1"
-
     while True:
         try:
-            subprocess.check_call(sys.argv)
-            sys.exit(0)
+            code = subprocess.call(sys.argv)
+            if code != 100:  # RESTART_EXIT_CODE
+                sys.exit(code)
         except KeyboardInterrupt:
             sys.exit(0)
-        except subprocess.CalledProcessError as exc:
-            if exc.returncode != hass.RESTART_EXIT_CODE:
-                sys.exit(exc.returncode)
 
 
-def install_requirements(reqs: list[str]):
-    # noinspection PyProtectedMember
-    requirements._install_requirements_if_missing(reqs, requirements.pip_kwargs(None))
-
-
-if __name__ == "__main__":
-    if "--runner" not in sys.argv:
-        run_forever()
-
-    # runner arg supported only on old Hass versions
-    sys.argv.remove("--runner")
-
-    assert sys.flags.utf8_mode, "env PYTHONUTF8=1 should be set"
-
-    logging.basicConfig(level=logging.INFO)
-
-    install_requirements(["colorlog"])
+def main() -> int:
+    from homeassistant import __main__ as hass
+    from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
 
     # noinspection unsupported-operator
     if (MAJOR_VERSION, MINOR_VERSION) >= (2026, 3):
@@ -58,4 +36,19 @@ if __name__ == "__main__":
 
     main()
 
-    sys.exit(hass.main())
+    return hass.main()
+
+
+if __name__ == "__main__":
+    if "--runner" not in sys.argv:
+        run_forever()
+
+    # runner arg supported only on old Hass versions
+    sys.argv.remove("--runner")
+
+    # https://docs.python.org/3/library/os.html#utf8-mode
+    os.environ["PYTHONUTF8"] = "1"
+
+    logging.basicConfig(level=logging.INFO)
+
+    sys.exit(main())
