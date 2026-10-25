@@ -39,15 +39,11 @@ args = [
     "https://alexxit.github.io/python-wheels/",
 ]
 
-if major == 2026:
-    # Fix first start for serialx
-    args.append("pywin32")
-
-elif major == 2023:
+if major == 2023:
     # ModuleNotFoundError: No module named 'pkg_resources'
     args.append("setuptools==78.1.1")  # version from HA 2026.9.0
 
-args += ["homeassistant==" + version]
+args += ["colorlog", "homeassistant==" + version]
 
 print(" ".join(args))
 
