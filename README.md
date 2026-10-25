@@ -5,12 +5,14 @@
 
 Portable version of Home Assistant for Windows.
 
+<img src="info.jpg" width="357">
+
 **ATTENTION:** Direct works on Windows is **not maintained by the core developers** of Home Assistant. So some components/integrations may not work at all. No need to ask me or the core authors to fix it. If something you need doesn't work - use [virtualization](https://www.home-assistant.io/installation/windows).
 
 Preinstalled:
 
-- [WinPython](https://winpython.github.io/) v3.14.2 64-bit
-- [Home Assistant](https://www.home-assistant.io/) v2026.3.3
+- [WinPython](https://winpython.github.io/) v3.14.7 64-bit
+- [Home Assistant](https://www.home-assistant.io/) v2026.10.4
 - [NotePad++](https://notepad-plus-plus.org/) v7.8.5 32bit
 - [HACS](https://hacs.xyz/) v2.0.5
 
@@ -43,6 +45,12 @@ Before any movement - stop the old and new Home Assistant!
 
 [![Home Assistant Windows Portable (HassWP)](https://img.youtube.com/vi/GFw3J3Jbuas/mqdefault.jpg)](https://www.youtube.com/watch?v=GFw3J3Jbuas)
 
+## Windows ARM64
+
+Starting with versions released in 2026, the `hass_win` supports running Home Assistant on Python arm64.
+The missing part of the libraries is being compiled in a separate project - [python-wheels](https://github.com/AlexxIT/python-wheels).
+The portable version is not being built because there is no WinPython for arm64.
+
 ## Do it yourself
 
 1. Download and unpack `WinpythonXX-3.XX.XX.0dot.exe`
@@ -50,8 +58,9 @@ Before any movement - stop the old and new Home Assistant!
 
 ```
 scripts\env.bat
-python -m pip install homeassistant==XXXX.XX
-pip install https://github.com/AlexxIT/HassWP/archive/master.zip
+pip install uv
+uv pip install homeassistant==XXXX.XX --system
+uv pip install https://github.com/AlexxIT/HassWP/archive/master.zip --system
 mkdir config
 python -m hass_win -c config -v
 ```
